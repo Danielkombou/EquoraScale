@@ -1,0 +1,7 @@
+{
+  "name": "Eqorascale MVP",
+  "description": "Enterprise-grade supply chain document management system featuring advanced file indexing, AI-powered document processing, and integrated RFQ, PO, and Quotation tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
