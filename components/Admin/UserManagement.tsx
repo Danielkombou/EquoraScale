@@ -4,11 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Icons } from '../../constants';
 import { UserProfile } from '../../services/auth';
 import { useToast } from '../UI/Toast';
-import { apiFetch } from '../../services/api';
+import { getAllUsers, deleteUser } from '../../services/users';
 
 interface UserListResponse {
   users: UserProfile[];

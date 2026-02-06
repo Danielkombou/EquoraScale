@@ -101,9 +101,12 @@ export interface ExtractTextResponse {
 
 // Convert backend file to frontend FileRecord
 const mapBackendFileToFileRecord = (file: BackendFile, folderPath: string = 'Root'): FileRecord => {
+  // Use originalName if available, fallback to fileName
+  const fileName = file.originalName || file.fileName || 'Untitled';
+  
   // Determine document type from filename or content (basic heuristic)
   let docType = DocumentType.GENERAL;
-  const name = file.originalName.toLowerCase();
+  const name = fileName.toLowerCase();
   if (name.includes('rfq') || name.includes('request for quotation')) {
     docType = DocumentType.RFQ;
   } else if (name.includes('po') || name.includes('purchase order')) {
@@ -116,7 +119,7 @@ const mapBackendFileToFileRecord = (file: BackendFile, folderPath: string = 'Roo
 
   return {
     id: String(file.id),
-    name: file.originalName,
+    name: fileName,
     type: file.mimeType,
     size: file.size,
     path: folderPath,
@@ -258,7 +261,7 @@ export const deleteFile = async (id: number): Promise<void> => {
 export const renameFile = async (id: number, newName: string): Promise<BackendFile> => {
   return apiFetch<BackendFile>(`/files/${id}/rename`, {
     method: 'PATCH',
-    body: { name: newName },
+    body: JSON.stringify({ name: newName }),
   });
 };
 

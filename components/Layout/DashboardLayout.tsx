@@ -184,13 +184,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
               <label className="flex items-center px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 bg-indigo-600 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-l-lg sm:rounded-l-xl hover:bg-indigo-700 cursor-pointer shadow-sm">
                 <Icons.File className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Files</span>
-                <input ref={fileInputRef} type="file" multiple accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileUpload} />
+                <input ref={fileInputRef} type="file" multiple accept="image/*,.pdf" className="hidden" onChange={handleFileUpload} />
               </label>
               <label className="flex items-center px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 bg-indigo-500 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-r-lg sm:rounded-r-xl hover:bg-indigo-600 cursor-pointer border-l border-indigo-400 shadow-sm">
                 <Icons.Folder className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Folder</span>
                 {/* @ts-ignore */}
-                <input type="file" webkitdirectory="" directory="" multiple accept=".pdf,.doc,.docx" className="hidden" onChange={handleFileUpload} />
+                <input type="file" webkitdirectory="" directory="" multiple accept="image/*,.pdf" className="hidden" onChange={handleFileUpload} />
               </label>
             </div>
           </div>
