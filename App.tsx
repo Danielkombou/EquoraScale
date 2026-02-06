@@ -7,13 +7,16 @@ import AuthForm from './components/Forms/AuthForm';
 import { ToastProvider } from './components/UI/Toast';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import RepositoryView from './components/Dashboard/RepositoryView';
+import { getProfile, loginUser, logoutUser } from './services/auth';
+import SettingsPage from './components/Settings/SettingsPage';
 
 // --- Auth Context Mockup for App-wide state ---
 export const AuthContext = React.createContext<{
   user: User | null;
-  login: (u: User) => void;
+  login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
-}>({ user: null, login: () => {}, logout: () => {} });
+  loading: boolean;
+}>({ user: null, login: async () => {}, logout: () => {}, loading: false });
 
 // --- Protected Route Guard ---
 // FIX: Using React.FC with an explicit children prop type to satisfy React 18 / TypeScript requirements
@@ -22,7 +25,8 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem('eqorascale_user') || 'null');
+  const { user, loading } = React.useContext(AuthContext);
+  if (loading) return null;
   if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
@@ -37,6 +41,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(() => {
     return JSON.parse(localStorage.getItem('eqorascale_user') || 'null');
   });
+  const [authLoading, setAuthLoading] = useState(true);
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -51,18 +56,40 @@ const App: React.FC = () => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  const login = (u: User) => {
-    setUser(u);
-    localStorage.setItem('eqorascale_user', JSON.stringify(u));
+  useEffect(() => {
+    const token = localStorage.getItem('eqorascale_token');
+    if (!token) {
+      setAuthLoading(false);
+      return;
+    }
+
+    getProfile()
+      .then((profile) => {
+        setUser(profile);
+        localStorage.setItem('eqorascale_user', JSON.stringify(profile));
+      })
+      .catch(() => {
+        logoutUser();
+        setUser(null);
+        localStorage.removeItem('eqorascale_user');
+      })
+      .finally(() => setAuthLoading(false));
+  }, []);
+
+  const login = async (usernameOrEmail: string, password: string) => {
+    const profile = await loginUser(usernameOrEmail, password);
+    setUser(profile);
+    localStorage.setItem('eqorascale_user', JSON.stringify(profile));
   };
 
   const logout = () => {
+    logoutUser();
     setUser(null);
     localStorage.removeItem('eqorascale_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading: authLoading }}>
       <ToastProvider>
         <BrowserRouter>
           <Routes>
@@ -114,12 +141,7 @@ const App: React.FC = () => {
                 </div>
               } />
               <Route path="settings" element={
-                <div className="p-8 flex items-center justify-center h-full">
-                  <div className="text-center opacity-40">
-                    <p className="text-4xl font-black mb-2 uppercase tracking-widest">Settings</p>
-                    <p className="text-sm font-bold uppercase tracking-widest">Module coming soon</p>
-                  </div>
-                </div>
+                <SettingsPage />
               } />
             </Route>
 

@@ -38,7 +38,7 @@ const TableView: React.FC<TableViewProps> = ({ files, onAnalyze, onDelete, setSe
                 <td colSpan={5} className="px-6 py-20 text-center">
                   <div className="flex flex-col items-center">
                     <Icons.File className="w-12 h-12 mb-4 text-slate-200 dark:text-slate-800" />
-                    <p className="font-black uppercase tracking-[0.3em] text-[10px] text-slate-400">Database Empty</p>
+                    <p className="font-black uppercase tracking-[0.3em] text-[10px] text-slate-400 dark:text-slate-500">Database Empty</p>
                   </div>
                 </td>
               </tr>

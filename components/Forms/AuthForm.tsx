@@ -1,11 +1,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../types';
 import { Icons } from '../../constants';
 
 interface AuthFormProps {
-  onLogin: (user: User) => void;
+  onLogin: (usernameOrEmail: string, password: string) => Promise<void>;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
@@ -14,14 +13,24 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username && password) {
-      onLogin({ id: '1', username, role: 'admin' });
-      navigate('/app');
-    } else {
+    if (!username || !password) {
       setError('Invalid credentials. Please enter your enterprise details.');
+      return;
+    }
+    setError('');
+    setIsSubmitting(true);
+    try {
+      await onLogin(username, password);
+      navigate('/app');
+    } catch (err: any) {
+      const message = err?.message || 'Login failed. Please verify your credentials.';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -29,8 +38,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
     <div className="min-h-screen flex bg-slate-950 transition-colors">
       <div className="hidden lg:flex flex-col justify-center items-center w-1/2 p-20 relative overflow-hidden bg-slate-950">
         <div className="absolute top-0 right-0 w-full h-full pointer-events-none">
-          <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]"></div>
-          <div className="absolute bottom-1/4 -left-20 w-[400px] h-[400px] bg-purple-600/5 rounded-full blur-[100px]"></div>
+          <div className="absolute top-1/4 -right-20 w-150 h-150 bg-indigo-600/10 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-1/4 -left-20 w-100 h-100 bg-purple-600/5 rounded-full blur-[100px]"></div>
         </div>
         <div className="relative z-10 max-w-xl">
           <div className="mb-10">
@@ -77,7 +86,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
               <label className="block text-[13px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-                  <Icons.Settings className="w-4.5 h-4.5" />
+                  <Icons.Lock className="w-4.5 h-4.5" />
                 </div>
                 <input 
                   type={showPassword ? "text" : "password"}
@@ -92,8 +101,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
               </div>
             </div>
             {error && <p className="text-rose-500 text-xs font-bold text-center">{error}</p>}
-            <button type="submit" className="w-full h-16 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-indigo-600/20 hover:scale-[1.01] transition-all flex items-center justify-center group">
-              Login <Icons.ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1" />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full h-16 bg-linear-to-r from-indigo-600 to-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-indigo-600/20 hover:scale-[1.01] transition-all flex items-center justify-center group disabled:opacity-60"
+            >
+              {isSubmitting ? 'Signing in...' : 'Login'}{' '}
+              <Icons.ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1" />
             </button>
           </form>
           <div className="mt-12 text-center text-slate-500 text-sm font-medium">If you need an account, contact your system admin.</div>

@@ -21,7 +21,29 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
   const { toast } = useToast();
   const [files, setFiles] = useState<FileRecord[]>(() => {
     const saved = localStorage.getItem('eqorascale_files');
-    return saved ? JSON.parse(saved) : INITIAL_FILES;
+    const filesData = saved ? JSON.parse(saved) : INITIAL_FILES;
+    
+    // Recreate blob URLs for stored files
+    if (saved) {
+      filesData.forEach((file: FileRecord) => {
+        const fileBlob = localStorage.getItem(`eqorascale_blob_${file.id}`);
+        if (fileBlob && !file.blobUrl) {
+          try {
+            const binaryData = atob(fileBlob);
+            const bytes = new Uint8Array(binaryData.length);
+            for (let i = 0; i < binaryData.length; i++) {
+              bytes[i] = binaryData.charCodeAt(i);
+            }
+            const blob = new Blob([bytes]);
+            file.blobUrl = URL.createObjectURL(blob);
+          } catch (e) {
+            console.error('Failed to recreate blob URL:', e);
+          }
+        }
+      });
+    }
+    
+    return filesData;
   });
 
   const [rawFilesMap, setRawFilesMap] = useState<Map<string, File>>(new Map());
@@ -98,12 +120,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
       const blobUrl = URL.createObjectURL(file);
       newRawMap.set(fileId, file);
 
+      // Store file blob as base64 for persistence across reloads
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result && typeof e.target.result === 'string') {
+          localStorage.setItem(`eqorascale_blob_${fileId}`, e.target.result.split(',')[1]);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      const relativePath = (file as any).webkitRelativePath as string | undefined;
+      const normalizedPath = relativePath
+        ? `Root/${relativePath.split('/').slice(0, -1).join('/')}`
+        : currentFolderPath;
+
       const record: FileRecord = {
         id: fileId,
         name: file.name,
         type: file.type,
         size: file.size,
-        path: currentFolderPath,
+        path: normalizedPath,
         createdAt: new Date().toISOString(),
         status: FileStatus.COMPLETED,
         docType: DocumentType.GENERAL,
@@ -113,12 +149,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
         isClassifying: true
       };
       newRecords.push(record);
-      triggerAnalysis(fileId, record.name, content);
     }
 
     if (newRecords.length > 0) {
       setRawFilesMap(newRawMap);
       setFiles(prev => [...prev, ...newRecords]);
+      newRecords.forEach((record) => {
+        triggerAnalysis(record.id, record.name, record.content || '');
+      });
       toast.success(`Indexed ${newRecords.length} documents.`);
     }
     event.target.value = '';
@@ -138,6 +176,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
   };
 
   const handleReset = () => {
+    // Clean up blob URLs and storage
+    files.forEach(file => {
+      localStorage.removeItem(`eqorascale_blob_${file.id}`);
+    });
     setFiles(INITIAL_FILES);
     localStorage.removeItem('eqorascale_files');
     toast.warning("Repository wiped.");
@@ -167,8 +209,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
               {isDarkMode ? <Icons.Sun className="w-5 h-5" /> : <Icons.Moon className="w-5 h-5" />}
             </button>
             <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
-              <button onClick={() => setViewMode(ViewMode.TABLE)} className={`p-1.5 rounded-md ${viewMode === ViewMode.TABLE ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500'}`}><Icons.List className="w-3.5 h-3.5" /></button>
-              <button onClick={() => setViewMode(ViewMode.EXPLORER)} className={`p-1.5 rounded-md ${viewMode === ViewMode.EXPLORER ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500'}`}><Icons.LayoutGrid className="w-3.5 h-3.5" /></button>
+              <button onClick={() => setViewMode(ViewMode.TABLE)} className={`p-1.5 rounded-md transition-all ${viewMode === ViewMode.TABLE ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500 dark:text-slate-400'}`}><Icons.List className="w-3.5 h-3.5" /></button>
+              <button onClick={() => setViewMode(ViewMode.EXPLORER)} className={`p-1.5 rounded-md transition-all ${viewMode === ViewMode.EXPLORER ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500 dark:text-slate-400'}`}><Icons.LayoutGrid className="w-3.5 h-3.5" /></button>
             </div>
             
             <div className="flex items-center">
@@ -198,6 +240,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
             setCurrentFolderPath,
             onDeleteFile: handleDeleteFile,
             onAnalyzeFile: handleManualAnalyze,
+            onUploadTrigger: () => fileInputRef.current?.click(),
             onReset: () => setIsResetModalOpen(true)
           }} />
         </div>

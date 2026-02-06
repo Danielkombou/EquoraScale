@@ -111,10 +111,10 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
   const docClassification = file.isClassifying ? 'Classifying...' : file.docType;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 lg:p-8">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 lg:p-8">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onClick={onClose}></div>
       
-      <div className="relative bg-white dark:bg-slate-900 w-full h-full max-w-[1600px] flex flex-col rounded-[40px] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
+      <div className="relative bg-white dark:bg-slate-900 w-full h-full max-w-400 flex flex-col rounded-[40px] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
         
         {/* Header */}
         <header className="h-20 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shrink-0">
@@ -155,31 +155,33 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
         <div className="flex-1 flex min-h-0">
           
           {/* Left: Document Viewer */}
-          <div className="flex-[3] border-r border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col min-w-0">
+          <div className="flex-3 border-r border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col min-w-0">
             <div className="flex-1 relative overflow-hidden">
-              {isPdf && (rawFile || file.blobUrl) ? (
-                <PdfViewer file={rawFile || file.blobUrl!} />
+              {isPdf && rawFile ? (
+                <PdfViewer file={rawFile} />
+              ) : isPdf && file.blobUrl ? (
+                <PdfViewer file={file.blobUrl} />
               ) : file.content ? (
                 <div className="h-full overflow-y-auto p-12 bg-white dark:bg-slate-900">
-                  <div className="max-w-4xl mx-auto bg-slate-50 dark:bg-slate-800/50 p-10 rounded-[32px] border border-slate-100 dark:border-slate-700 font-mono text-sm leading-relaxed whitespace-pre-wrap dark:text-slate-300">
+                  <div className="max-w-4xl mx-auto bg-slate-50 dark:bg-slate-800/50 p-10 rounded-4xl border border-slate-100 dark:border-slate-700 font-mono text-sm leading-relaxed whitespace-pre-wrap dark:text-slate-300">
                     <div className="mb-8 pb-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Document Content Extract</span>
                       <Icons.FileText className="w-4 h-4 text-slate-300" />
                     </div>
-                    {isPdf? file.blobUrl:file.content}
+                    {file.blobUrl}
                   </div>
                 </div>
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-center p-12">
                   <Icons.File className="w-20 h-20 text-slate-200 dark:text-slate-800 mb-6" />
-                  <p className="text-lg font-bold text-slate-600 dark:text-slate-400">Preview Unavailable</p>
+                  <p className="text-lg font-bold text-slate-600 dark:text-slate-400 transition-colors">Preview Unavailable</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Right: AI Intelligence Panel */}
-          <div className="flex-[2] flex flex-col min-w-0 bg-white dark:bg-slate-900">
+          <div className="flex-2 flex flex-col min-w-0 bg-white dark:bg-slate-900">
             
             {/* AI Chat History */}
             <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
@@ -187,7 +189,7 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
                 <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">System Intelligence</h3>
                 
                 {file.isClassifying ? (
-                  <div className="p-6 rounded-[24px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 flex items-center space-x-4 animate-pulse">
+                  <div className="p-10 rounded-[3xl] bg-slate-500 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 flex items-center space-x-4 animate-pulse">
                     <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent animate-spin rounded-full"></div>
                     <div>
                       <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Processing Content</p>
@@ -197,7 +199,7 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
                 ) : (
                   <>
                     {file.summary && (
-                      <div className="p-6 rounded-[24px] bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30">
+                      <div className="p-6 rounded-3xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30">
                         <p className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3">AI Abstract</p>
                         <p className="text-[15px] text-slate-700 dark:text-slate-200 font-medium leading-relaxed italic">"{file.summary}"</p>
                       </div>
@@ -220,7 +222,7 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
                     <Icons.Sparkles className="w-8 h-8" />
                   </div>
                   <h4 className="text-lg font-black mb-2 dark:text-white">Supply Chain Analyst</h4>
-                  <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-[280px]">
+                  <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed max-w-70">
                     I can help extract items, verify quantities, or summarize terms from this document.
                   </p>
                 </div>
@@ -240,7 +242,7 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
               
               {isChatLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-[24px] border border-slate-200 dark:border-slate-700 rounded-tl-none animate-pulse">
+                  <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-3xl border border-slate-200 dark:border-slate-700 rounded-tl-none animate-pulse">
                     <div className="flex space-x-1.5">
                       <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
                       <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
@@ -254,7 +256,7 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
 
             {/* Chat Input */}
             <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-md">
-              <form onSubmit={handleChatSubmit} className="flex items-center space-x-3 bg-white dark:bg-slate-800 p-2 rounded-[24px] shadow-sm border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+              <form onSubmit={handleChatSubmit} className="flex items-center space-x-3 bg-white dark:bg-slate-800 p-2 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                 <input 
                   type="text" 
                   disabled={file.isClassifying}

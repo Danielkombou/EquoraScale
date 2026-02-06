@@ -26,6 +26,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 }) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
+  const formatSize = (bytes: number) => {
+    if (!bytes && bytes !== 0) return '0 KB';
+    if (bytes < 1024) return `${bytes} Bytes`;
+    const kb = bytes / 1024;
+    if (kb < 1024) return `${kb.toFixed(2)} KB`;
+    const mb = kb / 1024;
+    if (mb < 1024) return `${mb.toFixed(2)} MB`;
+    const gb = mb / 1024;
+    return `${gb.toFixed(2)} GB`;
+  };
+
   const itemsInCurrentScope = files.filter(f => f.path.startsWith(currentPath));
   
   const subFolders = Array.from(new Set(
@@ -67,7 +78,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             <React.Fragment key={i}>
               <button 
                 onClick={() => setCurrentPath(breadcrumbs.slice(0, i + 1).join('/'))}
-                className={`hover:text-indigo-600 transition-colors whitespace-nowrap ${i === breadcrumbs.length - 1 ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400'}`}
+                className={`hover:text-indigo-600 transition-colors whitespace-nowrap ${i === breadcrumbs.length - 1 ? 'text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500'}`}
               >
                 {part}
               </button>
@@ -83,7 +94,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         {currentPath !== 'Root' && (
           <div 
             onClick={handleBack}
-            className="group flex flex-col items-center justify-center p-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 bg-slate-50/50 dark:bg-slate-900/20 cursor-pointer transition-all h-[180px]"
+            className="group flex flex-col items-center justify-center p-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 bg-slate-50/50 dark:bg-slate-900/20 cursor-pointer transition-all "
           >
             <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 text-slate-400 group-hover:text-indigo-600 transition-colors mb-2 shadow-sm">
               <Icons.Plus className="w-5 h-5 rotate-45" />
@@ -101,7 +112,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           return (
             <div 
               key={folderName}
-              className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group relative cursor-pointer h-[180px] flex flex-col"
+              className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group relative cursor-pointer  flex flex-col"
               onClick={() => setCurrentPath(folderPath)}
             >
               <div className="flex items-start justify-between mb-4">
@@ -156,7 +167,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           <div 
             key={file.id}
             onClick={() => setSelectedFile(file)}
-            className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group cursor-pointer flex flex-col relative h-[180px]"
+            className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group cursor-pointer flex flex-col relative"
           >
             {/* Action Bar */}
             <div className="absolute top-4 right-4 z-10 flex space-x-1 opacity-60 group-hover:opacity-100 transition-opacity">
@@ -177,9 +188,14 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
                 <div className="w-5 h-5 border-3 border-indigo-500 border-t-transparent animate-spin rounded-full"></div>
               )}
             </div>
-            <h3 className="text-xs font-bold text-slate-700 dark:text-slate-100 mb-1 truncate leading-tight pr-8" title={file.name}>{file.name}</h3>
+            <div
+              className="text-[12px] font-black text-slate-900 dark:text-slate-50 leading-tight pr-8 mb-2"
+              title={file.name}
+            >
+              <span className="block truncate">{file.name}</span>
+            </div>
             <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tighter mb-3">
-              {(file.size / 1024 / 1024).toFixed(2)} MB
+              {formatSize(file.size)}
             </p>
             <div className="mt-auto pt-3 border-t border-slate-50 dark:border-slate-800">
               <span className={`text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${file.isClassifying ? 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/30 animate-pulse' : DOC_TYPE_COLORS[file.docType]}`}>
@@ -192,7 +208,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         {/* ADD FILE TRIGGER */}
         <div 
           onClick={onUploadTrigger}
-          className="group flex flex-col items-center justify-center p-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer transition-all h-[180px]"
+          className="group flex flex-col items-center justify-center p-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer transition-all min-h-45"
         >
           <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm mb-2.5 group-hover:scale-105">
             <Icons.Plus className="w-6 h-6" />

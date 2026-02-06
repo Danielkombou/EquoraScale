@@ -18,6 +18,7 @@ const RepositoryView: React.FC = () => {
     setCurrentFolderPath,
     onDeleteFile,
     onAnalyzeFile,
+    onUploadTrigger,
     onReset
   } = useOutletContext<any>();
 
@@ -66,7 +67,7 @@ const RepositoryView: React.FC = () => {
             onDeleteFile={onDeleteFile}
             onRenameFolder={() => {}}
             onDeleteFolder={() => {}}
-            onUploadTrigger={() => {}}
+            onUploadTrigger={onUploadTrigger}
           />
         )}
       </div>

@@ -11,8 +11,13 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ file }) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const renderIdRef = useRef(0);
 
   useEffect(() => {
+    renderIdRef.current += 1;
+    const renderId = renderIdRef.current;
+    let cancelled = false;
+
     const renderPdf = async () => {
       if (!file || !containerRef.current) return;
       
@@ -29,15 +34,33 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ file }) => {
         if (file instanceof File || file instanceof Blob) {
           const arrayBuffer = await file.arrayBuffer();
           loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        } else if (typeof file === 'string') {
+          // Handle blob URL or regular URL
+          try {
+            // Try to load as URL first
+            loadingTask = pdfjsLib.getDocument(file);
+          } catch (urlErr) {
+            // If blob URL is invalid, try to fetch it
+            console.warn("Blob URL may have expired, attempting fallback:", urlErr);
+            setError("PDF preview is temporarily unavailable. This can happen after page reload with blob URLs. Please re-select the file.");
+            setLoading(false);
+            return;
+          }
         } else {
-          loadingTask = pdfjsLib.getDocument(file);
+          setError("Unsupported file format provided to PDF viewer.");
+          setLoading(false);
+          return;
         }
 
         const pdf = await loadingTask.promise;
+        if (cancelled || renderId !== renderIdRef.current) return;
+
         setNumPages(pdf.numPages);
 
         for (let i = 1; i <= pdf.numPages; i++) {
+          if (cancelled || renderId !== renderIdRef.current) return;
           const page = await pdf.getPage(i);
+          if (cancelled || renderId !== renderIdRef.current) return;
           const viewport = page.getViewport({ scale: 1.5 });
           
           const canvas = document.createElement('canvas');
@@ -46,7 +69,8 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ file }) => {
           canvas.width = viewport.width;
           canvas.className = "max-w-full h-auto shadow-lg mb-8 rounded-lg bg-white mx-auto block";
           
-          containerRef.current.appendChild(canvas);
+          if (cancelled || renderId !== renderIdRef.current) return;
+          containerRef.current?.appendChild(canvas);
 
           const renderContext = {
             canvasContext: context,
@@ -54,15 +78,23 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ file }) => {
           };
           await page.render(renderContext).promise;
         }
-        setLoading(false);
+        if (!cancelled && renderId === renderIdRef.current) {
+          setLoading(false);
+        }
       } catch (err) {
         console.error("PDF rendering failed:", err);
-        setError("Failed to render PDF document. This might be due to a corrupted file or security restrictions.");
-        setLoading(false);
+        if (!cancelled && renderId === renderIdRef.current) {
+          setError("Failed to render PDF document. This might be due to a corrupted file or security restrictions. Try re-uploading the document.");
+          setLoading(false);
+        }
       }
     };
 
     renderPdf();
+
+    return () => {
+      cancelled = true;
+    };
   }, [file]);
 
   return (

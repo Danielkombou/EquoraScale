@@ -38,7 +38,7 @@ const LandingPage: React.FC<LandingPageProps> = () => {
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest mb-8 border border-indigo-100 dark:border-indigo-800">Supply Chain Intelligence</div>
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 leading-[1]">Master your Supply Chain with <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">AI Precision.</span></h1>
-          <p className="text-xl text-slate-500 dark:text-slate-400 mb-12 max-w-2xl mx-auto">Enterprise-grade document management for industrial sectors. Automate RFQs, POs, and Invoices with Gemini intelligence.</p>
+          <p className="text-xl text-slate-500 dark:text-slate-400 mb-12 max-w-2xl mx-auto">Enterprise-grade document management for industrial sectors. Automate RFQs, POs, and Invoices with AI intelligence.</p>
           <div className="flex justify-center space-x-6">
             <button onClick={() => navigate('/login')} className="px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold flex items-center group">Enter Dashboard <Icons.ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" /></button>
             <button className="px-10 py-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold">Explore Demo</button>
@@ -49,7 +49,7 @@ const LandingPage: React.FC<LandingPageProps> = () => {
       {/* Other sections removed for brevity but they remain functional links */}
       
       <footer className="py-20 px-6 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-center">
-        <p className="text-slate-400 font-medium">© 2024 Eqorascale Enterprise. V1.0.0 MVP PLATFORM</p>
+        <p className="text-slate-400 font-medium">© 2026 Eqorascale Enterprise. V1.0.0 MVP PLATFORM</p>
       </footer>
     </div>
   );

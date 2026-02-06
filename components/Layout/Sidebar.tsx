@@ -48,13 +48,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, user }) => {
 
         <div className="pt-8">
           <p className="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Modules</p>
-          <NavLink to="/app/collections" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-400 hover:bg-slate-50'}`}>
+          <NavLink to="/app/collections" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
             <Icons.Folder className="w-5 h-5 mr-3" /> Collections
           </NavLink>
-          <NavLink to="/app/analytics" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-400 hover:bg-slate-50'}`}>
+          <NavLink to="/app/analytics" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
             <Icons.Globe className="w-5 h-5 mr-3" /> Analytics
           </NavLink>
-          <NavLink to="/app/settings" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-400 hover:bg-slate-50'}`}>
+          <NavLink to="/app/settings" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
             <Icons.Settings className="w-5 h-5 mr-3" /> Settings
           </NavLink>
         </div>

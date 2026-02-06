@@ -106,7 +106,7 @@ Whether you're managing complex supply chains or streamlining procurement workfl
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-org/eqorascale-mvp.git
+   git clone https://github.com/skaleway/EquoraScale.git
    cd eqorascale-mvp
    ```
 
@@ -126,7 +126,7 @@ Whether you're managing complex supply chains or streamlining procurement workfl
    ```bash
    npm run dev
    ```
-   The application will be available at `http://localhost:5173`
+   The application will be available at `http://localhost:3000`
 
 5. **Build for Production**
    ```bash
