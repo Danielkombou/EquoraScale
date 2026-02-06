@@ -43,12 +43,23 @@
         }
     </style>
     <script>
-        // Apply dark mode synchronously BEFORE React renders to prevent flash
+        // Apply theme synchronously BEFORE React renders to prevent flash
         (function() {
-            const saved = localStorage.getItem('theme');
-            const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            const saved = localStorage.getItem('theme') || 'system';
+            let isDark = false;
+            
+            if (saved === 'system' || !saved) {
+                // Use system preference
+                isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            } else {
+                // Use saved preference
+                isDark = saved === 'dark';
+            }
+            
             if (isDark) {
                 document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
         })();
     </script>

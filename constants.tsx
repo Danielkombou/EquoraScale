@@ -19,7 +19,8 @@ import {
   Sun,
   Trash2,
   Upload,
-  LockIcon
+  LockIcon,
+  Monitor
 } from 'lucide-react';
 
 export const STATUS_COLORS = {
@@ -40,6 +41,7 @@ export const DOC_TYPE_COLORS = {
 export const Icons = {
   Sun,
   Moon,
+  Monitor,
   Folder,
   File,
   FileText,

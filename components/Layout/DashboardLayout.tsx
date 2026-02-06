@@ -14,7 +14,6 @@ interface DashboardLayoutProps {
   user: User | null;
   onLogout: () => void;
   isDarkMode: boolean;
-  toggleTheme: () => void;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDarkMode, toggleTheme }) => {
@@ -205,9 +204,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
           </div>
           
           <div className="flex items-center justify-end space-x-2 sm:space-x-4 flex-shrink-0">
-            <button onClick={toggleTheme} className="p-1.5 sm:p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
-              {isDarkMode ? <Icons.Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Icons.Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-            </button>
+            {/* Theme toggle removed - now handled in Settings */}
             <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg">
               <button onClick={() => setViewMode(ViewMode.TABLE)} className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === ViewMode.TABLE ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500 dark:text-slate-400'}`}><Icons.List className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></button>
               <button onClick={() => setViewMode(ViewMode.EXPLORER)} className={`p-1 sm:p-1.5 rounded-md transition-all ${viewMode === ViewMode.EXPLORER ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600' : 'text-slate-500 dark:text-slate-400'}`}><Icons.LayoutGrid className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></button>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getProfileDetails, UserProfile } from '../../services/auth'; // Adjust path as needed
+import { getProfileDetails, UserProfile } from '../../services/auth';
+import { useTheme, ThemeMode } from '../../App';
+import { Icons } from '../../constants';
 import { 
   User, 
   Mail, 
@@ -31,6 +33,7 @@ const formatDate = (value?: string) => {
 const getInitials = (name: string) => name.slice(0, 2).toUpperCase();
 
 const SettingsPage: React.FC = () => {
+  const { theme, setTheme } = useTheme();
   const { data, isLoading, isError, error } = useQuery<UserProfile>({
     queryKey: ['profile'],
     queryFn: getProfileDetails,
@@ -123,6 +126,39 @@ const SettingsPage: React.FC = () => {
 
             {/* 2. Status & Security Card (Spans 4 columns) */}
             <div className="md:col-span-4 space-y-4 sm:space-y-6">
+              {/* Theme Selector */}
+              <div className="rounded-2xl sm:rounded-3xl lg:rounded-4xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 shadow-sm">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                  <Icons.Settings className="w-4 h-4 text-indigo-500" />
+                  Appearance
+                </h3>
+                <div className="space-y-2">
+                  {(['light', 'dark', 'system'] as ThemeMode[]).map((themeOption) => (
+                    <button
+                      key={themeOption}
+                      onClick={() => setTheme(themeOption)}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
+                        theme === themeOption
+                          ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800'
+                          : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {themeOption === 'light' && <Icons.Sun className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
+                        {themeOption === 'dark' && <Icons.Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
+                        {themeOption === 'system' && <Icons.Monitor className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
+                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 capitalize">
+                          {themeOption}
+                        </span>
+                      </div>
+                      {theme === themeOption && (
+                        <div className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="h-full rounded-2xl sm:rounded-3xl lg:rounded-4xl bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden">
                 <div>
                   <div className="flex items-center justify-between mb-4">
