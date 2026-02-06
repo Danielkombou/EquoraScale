@@ -6,7 +6,7 @@ import { Icons, STATUS_COLORS, DOC_TYPE_COLORS } from '../../constants';
 interface TableViewProps {
   files: FileRecord[];
   onAnalyze: (file: FileRecord) => void;
-  onDelete: (fileId: string) => void;
+  onDelete?: (fileId: string) => void;
   setSelectedFile: (file: FileRecord) => void;
 }
 
@@ -107,13 +107,15 @@ const TableView: React.FC<TableViewProps> = ({ files, onAnalyze, onDelete, setSe
                       >
                         <Icons.Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                       </button>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onDelete(file.id); }}
-                        className="p-1.5 sm:p-2 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 transition-all rounded-lg shadow-sm"
-                        title="Delete Document"
-                      >
-                        <Icons.Trash className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                      </button>
+                      {onDelete && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); onDelete(file.id); }}
+                          className="p-1.5 sm:p-2 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 transition-all rounded-lg shadow-sm"
+                          title="Delete Document"
+                        >
+                          <Icons.Trash className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

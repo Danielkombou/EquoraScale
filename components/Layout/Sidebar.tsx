@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { DocumentType, User } from '../../types';
 import { Icons } from '../../constants';
+import { useIsAdmin, useCanAccess } from '../../hooks/usePermissions';
 
 interface SidebarProps {
   onLogout: () => void;
@@ -12,6 +13,8 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onLogout, user }) => {
   const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const isAdmin = useIsAdmin();
+  const canViewAnalytics = useCanAccess('analytics');
   
   const menuItems = [
     { id: 'ALL', path: '/app/repository/ALL', label: 'Dashboard', icon: Icons.LayoutGrid },
@@ -78,12 +81,26 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, user }) => {
           <NavLink to="/app/collections" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
             <Icons.Folder className="w-5 h-5 mr-3" /> Collections
           </NavLink>
-          <NavLink to="/app/analytics" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-            <Icons.Globe className="w-5 h-5 mr-3" /> Analytics
-          </NavLink>
+          {canViewAnalytics && (
+            <NavLink to="/app/analytics" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+              <Icons.Globe className="w-5 h-5 mr-3" /> Analytics
+            </NavLink>
+          )}
           <NavLink to="/app/settings" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
             <Icons.Settings className="w-5 h-5 mr-3" /> Settings
           </NavLink>
+          
+          {/* Admin Section */}
+          {isAdmin && (
+            <>
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800 mt-2">
+                <p className="px-4 text-[10px] font-bold text-indigo-400 dark:text-indigo-500 uppercase tracking-widest mb-2">Admin</p>
+                <NavLink to="/app/admin" className={({ isActive }) => `w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-medium transition-all group ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  <Icons.Sparkles className="w-5 h-5 mr-3" /> Admin Panel
+                </NavLink>
+              </div>
+            </>
+          )}
         </div>
       </nav>
 

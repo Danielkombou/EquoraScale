@@ -1,5 +1,6 @@
 import { User } from '../types';
 import { apiFetch, setAuthToken } from './api';
+import { isAdmin, hasRole, hasPermission, Permission } from '../utils/permissions';
 
 type LoginResponse = {
   message: string;
@@ -62,4 +63,63 @@ export const getProfileDetails = async (): Promise<UserProfile> => {
 
 export const logoutUser = () => {
   setAuthToken(null);
+};
+
+export type RegisterUserDto = {
+  username: string;
+  email: string;
+  password: string;
+  metadata?: Record<string, any>;
+  role?: 'admin' | 'user';
+  secretKey: string;
+};
+
+type RegisterResponse = {
+  message: string;
+  user: any;
+};
+
+export const registerUser = async (registerDto: RegisterUserDto) => {
+  const data = await apiFetch<RegisterResponse>('/auth/register', {
+    method: 'POST',
+    body: registerDto,
+  });
+
+  return mapUser(data.user);
+};
+
+/**
+ * Role validation helpers
+ */
+export const validateUserRole = (user: User | null, requiredRole: string): boolean => {
+  return hasRole(user, requiredRole);
+};
+
+export const validateUserIsAdmin = (user: User | null): boolean => {
+  return isAdmin(user);
+};
+
+export const validateUserPermission = (user: User | null, permission: Permission): boolean => {
+  return hasPermission(user, permission);
+};
+
+/**
+ * Check if user can perform an action
+ */
+export const canUserPerformAction = (user: User | null, action: string): boolean => {
+  if (!user) return false;
+  
+  const actionPermissions: Record<string, Permission> = {
+    'delete-document': Permission.DELETE_DOCUMENTS,
+    'upload-document': Permission.UPLOAD_DOCUMENTS,
+    'edit-document': Permission.EDIT_DOCUMENTS,
+    'manage-users': Permission.MANAGE_USER_ROLES,
+    'view-analytics': Permission.VIEW_ANALYTICS,
+    'reset-database': Permission.RESET_DATABASE,
+  };
+  
+  const requiredPermission = actionPermissions[action];
+  if (!requiredPermission) return false;
+  
+  return hasPermission(user, requiredPermission);
 };

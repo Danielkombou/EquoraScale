@@ -9,6 +9,11 @@ import DashboardLayout from './components/Layout/DashboardLayout';
 import RepositoryView from './components/Dashboard/RepositoryView';
 import { getProfile, loginUser, logoutUser } from './services/auth';
 import SettingsPage from './components/Settings/SettingsPage';
+import AdminRoute from './components/Admin/AdminRoute';
+import RoleRoute from './components/Admin/RoleRoute';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import UserManagement from './components/Admin/UserManagement';
+import AdminAnalytics from './components/Admin/AdminAnalytics';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -192,7 +197,7 @@ const App: React.FC = () => {
                 <Route index element={<Navigate to="repository/ALL" replace />} />
                 <Route path="repository/:tab" element={<RepositoryView />} />
                 
-                {/* Scale placeholders */}
+                {/* Collections - All authenticated users */}
                 <Route path="collections" element={
                   <div className="p-8 flex items-center justify-center h-full">
                     <div className="text-center opacity-40">
@@ -201,17 +206,34 @@ const App: React.FC = () => {
                     </div>
                   </div>
                 } />
+                
+                {/* Analytics - Admin only */}
                 <Route path="analytics" element={
-                  <div className="p-8 flex items-center justify-center h-full">
-                     <div className="text-center opacity-40">
-                      <p className="text-4xl font-black mb-2 uppercase tracking-widest">Analytics</p>
-                      <p className="text-sm font-bold uppercase tracking-widest">Module coming soon</p>
+                  <AdminRoute>
+                    <div className="p-8 flex items-center justify-center h-full">
+                      <div className="text-center opacity-40">
+                        <p className="text-4xl font-black mb-2 uppercase tracking-widest">Analytics</p>
+                        <p className="text-sm font-bold uppercase tracking-widest">Module coming soon</p>
+                      </div>
                     </div>
-                  </div>
+                  </AdminRoute>
                 } />
+                
+                {/* Settings - All authenticated users (but admin sees more) */}
                 <Route path="settings" element={
                   <SettingsPage />
                 } />
+                
+                {/* Admin Panel Routes */}
+                <Route path="admin" element={
+                  <AdminRoute>
+                    <Outlet />
+                  </AdminRoute>
+                }>
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="users" element={<UserManagement />} />
+                </Route>
               </Route>
 
               {/* Catch-all */}

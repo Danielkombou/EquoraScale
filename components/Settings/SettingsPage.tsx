@@ -178,7 +178,7 @@ const SettingsPage: React.FC = () => {
                     </div>
                     <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-xl">
                       <p className="text-xs text-indigo-600 dark:text-indigo-300 font-medium leading-relaxed">
-                        Your session is secured via JWT. Role-based access control is currently enforced.
+                        Your session is secured via JWT. Role-based access control is actively enforced.
                       </p>
                     </div>
                   </div>

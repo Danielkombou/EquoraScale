@@ -4,10 +4,15 @@ import { useParams, useOutletContext } from 'react-router-dom';
 import { DocumentType, FileRecord, ViewMode } from '../../types';
 import TableView from '../FileExplorer/TableView';
 import FileExplorer from '../FileExplorer/FileExplorer';
+import { useHasPermission, useIsAdmin } from '../../hooks/usePermissions';
+import { Permission } from '../../utils/permissions';
 
 const RepositoryView: React.FC = () => {
   const { tab } = useParams<{ tab: string }>();
   const activeTab = tab || 'ALL';
+  const canDelete = useHasPermission(Permission.DELETE_DOCUMENTS);
+  const canUpload = useHasPermission(Permission.UPLOAD_DOCUMENTS);
+  const canReset = useIsAdmin(); // Only admin can reset database
   
   const { 
     files, 
@@ -55,7 +60,7 @@ const RepositoryView: React.FC = () => {
           <TableView 
             files={filteredFiles} 
             onAnalyze={onAnalyzeFile} 
-            onDelete={onDeleteFile}
+            onDelete={canDelete ? onDeleteFile : undefined}
             setSelectedFile={setSelectedFile}
           />
         ) : (
@@ -64,10 +69,10 @@ const RepositoryView: React.FC = () => {
             currentPath={currentFolderPath}
             setCurrentPath={setCurrentFolderPath}
             setSelectedFile={setSelectedFile}
-            onDeleteFile={onDeleteFile}
+            onDeleteFile={canDelete ? onDeleteFile : undefined}
             onRenameFolder={() => {}}
             onDeleteFolder={() => {}}
-            onUploadTrigger={onUploadTrigger}
+            onUploadTrigger={canUpload ? onUploadTrigger : undefined}
           />
         )}
       </div>

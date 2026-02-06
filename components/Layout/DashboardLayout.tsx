@@ -1,14 +1,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Sidebar from './Sidebar';
 import { User, FileRecord, DocumentType, ViewMode, FileStatus } from '../../types';
-import { INITIAL_FILES } from '../../store/mockData';
 import { Icons } from '../../constants';
 import { useToast } from '../UI/Toast';
 import { analyzeDocument, askDocumentQuestion } from '../../services/ai';
 import FileDetailModal from '../FileExplorer/FileDetailModal';
 import ConfirmationModal from '../UI/ConfirmationModal';
+import { useHasPermission, useIsAdmin } from '../../hooks/usePermissions';
+import { Permission } from '../../utils/permissions';
+import {
+  listFiles,
+  flattenFileStructure,
+  uploadFile,
+  uploadMultipleFiles,
+  uploadFolder,
+  deleteFile,
+  getFile,
+} from '../../services/files';
 
 interface DashboardLayoutProps {
   user: User | null;
@@ -16,49 +27,32 @@ interface DashboardLayoutProps {
   isDarkMode: boolean;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDarkMode, toggleTheme }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDarkMode }) => {
   const { toast } = useToast();
-  const [files, setFiles] = useState<FileRecord[]>(() => {
-    const saved = localStorage.getItem('eqorascale_files');
-    const filesData = saved ? JSON.parse(saved) : INITIAL_FILES;
-    
-    // Recreate blob URLs for stored files
-    if (saved) {
-      filesData.forEach((file: FileRecord) => {
-        const fileBlob = localStorage.getItem(`eqorascale_blob_${file.id}`);
-        if (fileBlob && !file.blobUrl) {
-          try {
-            const binaryData = atob(fileBlob);
-            const bytes = new Uint8Array(binaryData.length);
-            for (let i = 0; i < binaryData.length; i++) {
-              bytes[i] = binaryData.charCodeAt(i);
-            }
-            const blob = new Blob([bytes]);
-            file.blobUrl = URL.createObjectURL(blob);
-          } catch (e) {
-            console.error('Failed to recreate blob URL:', e);
-          }
-        }
-      });
-    }
-    
-    return filesData;
-  });
-
-  const [rawFilesMap, setRawFilesMap] = useState<Map<string, File>>(new Map());
+  const queryClient = useQueryClient();
+  const canUpload = useHasPermission(Permission.UPLOAD_DOCUMENTS);
+  const canDelete = useHasPermission(Permission.DELETE_DOCUMENTS);
+  const canReset = useIsAdmin();
+  
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.TABLE);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFile, setSelectedFile] = useState<FileRecord | null>(null);
   const [currentFolderPath, setCurrentFolderPath] = useState('Root');
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [currentFolderId, setCurrentFolderId] = useState<number | undefined>(undefined);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
 
-  useEffect(() => {
-    const metadata = files.map(({blobUrl, isClassifying, ...f}) => f);
-    localStorage.setItem('eqorascale_files', JSON.stringify(metadata));
-  }, [files]);
+  // Fetch files from API
+  const { data: fileStructure, isLoading: filesLoading, refetch: refetchFiles } = useQuery({
+    queryKey: ['files', currentFolderId],
+    queryFn: () => listFiles(currentFolderId),
+    staleTime: 1000 * 60, // 1 minute
+  });
+
+  // Convert file structure to flat array
+  const files: FileRecord[] = fileStructure ? flattenFileStructure(fileStructure, currentFolderPath) : [];
 
   const extractText = async (file: File): Promise<string> => {
     const fileName = file.name.toLowerCase();
@@ -105,83 +99,59 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const rawFiles = event.target.files;
-    if (!rawFiles) return;
-    const newRecords: FileRecord[] = [];
-    const newRawMap = new Map(rawFilesMap);
+    if (!rawFiles || rawFiles.length === 0) return;
 
-    // FIX: Cast Array.from(rawFiles) to File[] to resolve 'unknown' type issues and access File properties
-    for (const file of Array.from(rawFiles) as File[]) {
-      const fileName = file.name.toLowerCase();
-      if (!fileName.endsWith('.pdf') && !fileName.endsWith('.doc') && !fileName.endsWith('.docx')) continue;
-
-      const fileId = Math.random().toString(36).substr(2, 9);
-      const content = await extractText(file);
-      const blobUrl = URL.createObjectURL(file);
-      newRawMap.set(fileId, file);
-
-      // Store file blob as base64 for persistence across reloads
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result && typeof e.target.result === 'string') {
-          localStorage.setItem(`eqorascale_blob_${fileId}`, e.target.result.split(',')[1]);
-        }
-      };
-      reader.readAsDataURL(file);
-
-      const relativePath = (file as any).webkitRelativePath as string | undefined;
-      const normalizedPath = relativePath
-        ? `Root/${relativePath.split('/').slice(0, -1).join('/')}`
-        : currentFolderPath;
-
-      const record: FileRecord = {
-        id: fileId,
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        path: normalizedPath,
-        createdAt: new Date().toISOString(),
-        status: FileStatus.COMPLETED,
-        docType: DocumentType.GENERAL,
-        tags: ['New'],
-        content,
-        blobUrl,
-        isClassifying: true
-      };
-      newRecords.push(record);
-    }
-
-    if (newRecords.length > 0) {
-      setRawFilesMap(newRawMap);
-      setFiles(prev => [...prev, ...newRecords]);
-      newRecords.forEach((record) => {
-        triggerAnalysis(record.id, record.name, record.content || '');
+    const fileArray = Array.from(rawFiles) as File[];
+    
+    // Check if this is a folder upload (has webkitRelativePath)
+    const isFolderUpload = fileArray.some(f => (f as any).webkitRelativePath);
+    
+    if (isFolderUpload) {
+      // Upload as folder structure
+      uploadFolderMutation.mutate({
+        files: fileArray,
+        folderPath: currentFolderPath !== 'Root' ? currentFolderPath.replace('Root/', '') : undefined,
       });
-      toast.success(`Indexed ${newRecords.length} documents.`);
+    } else if (fileArray.length === 1) {
+      // Single file upload
+      uploadFileMutation.mutate(fileArray[0]);
+    } else {
+      // Multiple files upload
+      uploadMultipleMutation.mutate(fileArray);
     }
+    
     event.target.value = '';
   };
 
   const handleManualAnalyze = async (file: FileRecord) => {
-    setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isClassifying: true } : f));
     await triggerAnalysis(file.id, file.name, file.content || '');
     toast.info(`Analyzing ${file.name}...`);
   };
 
-  const handleDeleteFile = (fileId: string) => {
+  const handleDeleteFile = async (fileId: string) => {
+    if (!canDelete) {
+      toast.error("You don't have permission to delete documents.");
+      return;
+    }
     if (confirm("Delete document?")) {
-      setFiles(prev => prev.filter(f => f.id !== fileId));
-      toast.success("Document removed.");
+      try {
+        await deleteFileMutation.mutateAsync(parseInt(fileId, 10));
+        setSelectedFile(null);
+      } catch (error) {
+        // Error already handled by mutation
+      }
     }
   };
 
   const handleReset = () => {
-    // Clean up blob URLs and storage
-    files.forEach(file => {
-      localStorage.removeItem(`eqorascale_blob_${file.id}`);
-    });
-    setFiles(INITIAL_FILES);
-    localStorage.removeItem('eqorascale_files');
-    toast.warning("Repository wiped.");
+    if (!canReset) {
+      toast.error("Only administrators can reset the database.");
+      return;
+    }
+    // Note: Backend doesn't have a reset endpoint
+    // This would need to be implemented on the backend
+    toast.warning("Reset functionality requires backend implementation.");
+    setIsResetModalOpen(false);
   };
 
   return (
@@ -227,31 +197,36 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
         </header>
 
         <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-          <Outlet context={{ 
-            files, 
-            setFiles, 
-            viewMode, 
-            searchQuery, 
-            setSelectedFile, 
-            currentFolderPath, 
-            setCurrentFolderPath,
-            onDeleteFile: handleDeleteFile,
-            onAnalyzeFile: handleManualAnalyze,
-            onUploadTrigger: () => fileInputRef.current?.click(),
-            onReset: () => setIsResetModalOpen(true)
-          }} />
+          {filesLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <Outlet context={{ 
+              files, 
+              viewMode, 
+              searchQuery, 
+              setSelectedFile, 
+              currentFolderPath, 
+              setCurrentFolderPath,
+              onDeleteFile: handleDeleteFile,
+              onAnalyzeFile: handleManualAnalyze,
+              onUploadTrigger: () => fileInputRef.current?.click(),
+              onReset: () => setIsResetModalOpen(true)
+            }} />
+          )}
         </div>
       </main>
 
       {selectedFile && (
         <FileDetailModal 
           file={selectedFile}
-          rawFile={rawFilesMap.get(selectedFile.id)}
+          rawFile={undefined}
           isOpen={!!selectedFile}
           onClose={() => setSelectedFile(null)}
           onAnalyze={handleManualAnalyze}
           onAsk={(q) => askDocumentQuestion(selectedFile.name, selectedFile.content || '', q)}
-          isProcessing={selectedFile.isClassifying || false}
+          isProcessing={false}
         />
       )}
 

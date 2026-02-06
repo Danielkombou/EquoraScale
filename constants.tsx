@@ -20,7 +20,18 @@ import {
   Trash2,
   Upload,
   LockIcon,
-  Monitor
+  Monitor,
+  Users,
+  UserPlus,
+  Edit,
+  Shield,
+  Activity,
+  Database,
+  Clock,
+  BarChart3,
+  TrendingUp,
+  Key,
+  Filter
 } from 'lucide-react';
 
 export const STATUS_COLORS = {
@@ -59,5 +70,16 @@ export const Icons = {
   ArrowRight,
   Globe,
   Trash: Trash2,
-  Lock:LockIcon
+  Lock: LockIcon,
+  Users,
+  UserPlus,
+  Edit,
+  Shield,
+  Activity,
+  Database,
+  Clock,
+  BarChart3,
+  TrendingUp,
+  Key,
+  Filter
 };

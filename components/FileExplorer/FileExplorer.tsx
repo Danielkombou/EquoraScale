@@ -10,8 +10,8 @@ interface FileExplorerProps {
   setSelectedFile: (file: FileRecord) => void;
   onRenameFolder: (path: string) => void;
   onDeleteFolder: (path: string) => void;
-  onDeleteFile: (fileId: string) => void;
-  onUploadTrigger: () => void;
+  onDeleteFile?: (fileId: string) => void;
+  onUploadTrigger?: () => void;
 }
 
 const FileExplorer: React.FC<FileExplorerProps> = ({ 
@@ -170,15 +170,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group cursor-pointer flex flex-col relative"
           >
             {/* Action Bar */}
-            <div className="absolute top-4 right-4 z-10 flex space-x-1 opacity-60 group-hover:opacity-100 transition-opacity">
-               <button 
-                onClick={(e) => { e.stopPropagation(); onDeleteFile(file.id); }}
-                className="p-1.5 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 transition-all rounded-lg shadow-sm border border-slate-100 dark:border-slate-700"
-                title="Delete"
-               >
-                <Icons.Trash className="w-3.5 h-3.5" />
-               </button>
-            </div>
+            {onDeleteFile && (
+              <div className="absolute top-4 right-4 z-10 flex space-x-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onDeleteFile(file.id); }}
+                  className="p-1.5 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 transition-all rounded-lg shadow-sm border border-slate-100 dark:border-slate-700"
+                  title="Delete"
+                >
+                  <Icons.Trash className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
@@ -206,15 +208,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         ))}
         
         {/* ADD FILE TRIGGER */}
-        <div 
-          onClick={onUploadTrigger}
-          className="group flex flex-col items-center justify-center p-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer transition-all min-h-45"
-        >
-          <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm mb-2.5 group-hover:scale-105">
-            <Icons.Plus className="w-6 h-6" />
+        {onUploadTrigger && (
+          <div 
+            onClick={onUploadTrigger}
+            className="group flex flex-col items-center justify-center p-5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 cursor-pointer transition-all min-h-45"
+          >
+            <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm mb-2.5 group-hover:scale-105">
+              <Icons.Plus className="w-6 h-6" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-indigo-600 text-center">Add Document</span>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-indigo-600 text-center">Add Document</span>
-        </div>
+        )}
 
       </div>
       
