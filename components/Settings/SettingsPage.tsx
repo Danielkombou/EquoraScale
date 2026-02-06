@@ -41,69 +41,70 @@ const SettingsPage: React.FC = () => {
   if (isError) return <ErrorState error={error} />;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-4 md:p-4 font-sans selection:bg-indigo-500/20">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-3 sm:p-4 md:p-6 font-sans selection:bg-indigo-500/20">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
               Settings
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm font-medium">
+            <p className="text-slate-500 dark:text-slate-400 mt-1 sm:mt-2 text-xs sm:text-sm font-medium">
               Manage your personal details and security preferences.
             </p>
           </div>
-          <div className="px-3 py-1 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 backdrop-blur-sm">
-            <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
+          <div className="px-2.5 sm:px-3 py-1 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 backdrop-blur-sm shrink-0">
+            <span className="text-[10px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5 sm:gap-2">
+              <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-full w-full bg-emerald-500"></span>
               </span>
-              System Operational
+              <span className="hidden sm:inline">System Operational</span>
+              <span className="sm:hidden">Operational</span>
             </span>
           </div>
         </div>
 
         {data && (
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
             
             {/* 1. Hero Profile Card (Spans 8 columns) */}
-            <div className="md:col-span-8 relative group overflow-hidden rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+            <div className="md:col-span-8 relative group overflow-hidden rounded-lg sm:rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
               {/* Decorative Gradient Background */}
-              <div className="absolute top-0 left-0 w-full h-32 bg-blue-500 pacity-90" />
+              <div className="absolute top-0 left-0 w-full h-24 sm:h-32 bg-blue-500 pacity-90" />
               
-              <div className="relative pt-20 px-8 pb-8">
-                <div className="flex flex-col md:flex-row gap-6 items-start md:items-end">
+              <div className="relative pt-16 sm:pt-20 px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-end">
                   {/* Avatar */}
-                  <div className="w-24 h-24 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-2xl font-black shadow-xl ring-4 ring-white dark:ring-slate-900">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-xl sm:rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-xl sm:text-2xl font-black shadow-xl ring-4 ring-white dark:ring-slate-900">
                     {getInitials(data.username)}
                   </div>
                   
                   {/* Name & Badge */}
-                  <div className="flex-1 mb-2">
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+                  <div className="flex-1 mb-0 sm:mb-2 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white truncate">
                         {data.username}
                       </h2>
                       {data.is_active ? (
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-500/50 text-emerald-600 dark:text-emerald-100 text-[10px] font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-500/20">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-500/50 text-emerald-600 dark:text-emerald-100 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-500/20 w-fit">
                           Active
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-500/50 text-rose-600 dark:text-rose-100 text-[10px] font-bold uppercase tracking-wider border border-rose-200 dark:border-rose-500/20">
+                        <span className="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-500/50 text-rose-600 dark:text-rose-100 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider border border-rose-200 dark:border-rose-500/20 w-fit">
                           Inactive
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mt-1">
-                      <Mail className="w-4 h-4" />
-                      <span className="text-sm font-medium">{data.email || 'No email linked'}</span>
+                      <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium truncate">{data.email || 'No email linked'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <InfoItem 
                     icon={Fingerprint} 
                     label="User ID" 
@@ -121,8 +122,8 @@ const SettingsPage: React.FC = () => {
             </div>
 
             {/* 2. Status & Security Card (Spans 4 columns) */}
-            <div className="md:col-span-4 space-y-6">
-              <div className="h-full rounded-4xl bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between relative overflow-hidden">
+            <div className="md:col-span-4 space-y-4 sm:space-y-6">
+              <div className="h-full rounded-2xl sm:rounded-3xl lg:rounded-4xl bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden">
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -213,13 +214,13 @@ const InfoItem = ({
   highlight?: boolean,
   copyable?: boolean
 }) => (
-  <div className="group flex items-start space-x-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-    <div className={`p-2 rounded-lg ${highlight ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
-      <Icon className="w-4 h-4" />
+  <div className="group flex items-start space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-lg sm:rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+    <div className={`p-1.5 sm:p-2 rounded-lg shrink-0 ${highlight ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+      <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
     </div>
-    <div className="flex-1 overflow-hidden">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
-      <p className={`mt-0.5 text-sm font-semibold truncate ${highlight ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'}`}>
+    <div className="flex-1 overflow-hidden min-w-0">
+      <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
+      <p className={`mt-0.5 text-xs sm:text-sm font-semibold truncate ${highlight ? 'text-indigo-600 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'}`}>
         {value || '—'}
       </p>
     </div>

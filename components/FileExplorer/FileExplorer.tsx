@@ -62,18 +62,18 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   return (
     <div className="space-y-5">
       {/* Navigation Header */}
-      <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
         {currentPath !== 'Root' && (
           <button 
             onClick={handleBack}
-            className="flex items-center px-3 py-1.5 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-800 shadow-sm"
+            className="flex items-center px-2.5 sm:px-3 py-1.5 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 rounded-lg sm:rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-800 shadow-sm"
           >
-            <Icons.Plus className="w-3.5 h-3.5 rotate-45 mr-1.5" />
+            <Icons.Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 rotate-45 mr-1 sm:mr-1.5" />
             Back
           </button>
         )}
         
-        <div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar py-2">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar py-2 flex-1 min-w-0">
           {breadcrumbs.map((part, i) => (
             <React.Fragment key={i}>
               <button 
@@ -82,13 +82,13 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
               >
                 {part}
               </button>
-              {i < breadcrumbs.length - 1 && <Icons.ChevronRight className="w-3 h-3 text-slate-300 shrink-0" />}
+              {i < breadcrumbs.length - 1 && <Icons.ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-300 shrink-0" />}
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
         
         {/* Go Back Trigger Card */}
         {currentPath !== 'Root' && (

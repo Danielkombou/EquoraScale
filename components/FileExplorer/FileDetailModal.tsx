@@ -111,51 +111,52 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
   const docClassification = file.isClassifying ? 'Classifying...' : file.docType;
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 lg:p-8">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 lg:p-8">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onClick={onClose}></div>
       
-      <div className="relative bg-white dark:bg-slate-900 w-full h-full max-w-400 flex flex-col rounded-[40px] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
+      <div className="relative bg-white dark:bg-slate-900 w-full h-full max-w-full lg:max-w-[1600px] flex flex-col rounded-none sm:rounded-[32px] lg:rounded-[40px] shadow-2xl overflow-hidden border-0 sm:border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
         
         {/* Header */}
-        <header className="h-20 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-8 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shrink-0">
-          <div className="flex items-center space-x-4 overflow-hidden">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl shrink-0">
-              <Icons.FileText className="w-6 h-6" />
+        <header className="h-auto min-h-[64px] sm:h-20 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 lg:px-8 py-3 sm:py-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shrink-0">
+          <div className="flex items-center space-x-3 sm:space-x-4 overflow-hidden flex-1 min-w-0">
+            <div className="p-2 sm:p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl sm:rounded-2xl shrink-0">
+              <Icons.FileText className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div className="min-w-0">
-              <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 truncate tracking-tight">{file.name}</h2>
-              <div className="flex items-center space-x-2 mt-0.5">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${file.isClassifying ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40' : DOC_TYPE_COLORS[file.docType]}`}>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg lg:text-xl font-black text-slate-800 dark:text-slate-100 truncate tracking-tight">{file.name}</h2>
+              <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 mt-1 sm:mt-0.5">
+                <span className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase tracking-widest ${file.isClassifying ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40' : DOC_TYPE_COLORS[file.docType]}`}>
                   {docClassification}
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">•</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">•</span>
+                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
             <button 
               onClick={() => onAnalyze(file)}
               disabled={isProcessing || file.isClassifying}
-              className="flex items-center px-6 py-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 rounded-2xl font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 transition-all disabled:opacity-50"
+              className="flex-1 sm:flex-none flex items-center justify-center px-4 sm:px-6 py-2 sm:py-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 transition-all disabled:opacity-50"
             >
-              <Icons.Sparkles className={`w-4 h-4 mr-2 ${(isProcessing || file.isClassifying) ? 'animate-pulse' : ''}`} />
-              {(isProcessing || file.isClassifying) ? 'Syncing...' : 'Deep Analysis'}
+              <Icons.Sparkles className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 ${(isProcessing || file.isClassifying) ? 'animate-pulse' : ''}`} />
+              <span className="hidden sm:inline">{(isProcessing || file.isClassifying) ? 'Syncing...' : 'Deep Analysis'}</span>
+              <span className="sm:hidden">{(isProcessing || file.isClassifying) ? 'Sync' : 'Analyze'}</span>
             </button>
             <button 
               onClick={onClose}
-              className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl text-slate-500 transition-all"
+              className="p-2 sm:p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl sm:rounded-2xl text-slate-500 transition-all"
             >
-              <Icons.Plus className="w-6 h-6 rotate-45" />
+              <Icons.Plus className="w-5 h-5 sm:w-6 sm:h-6 rotate-45" />
             </button>
           </div>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 flex min-h-0">
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0">
           
           {/* Left: Document Viewer */}
-          <div className="flex-3 border-r border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col min-w-0">
+          <div className="flex-1 lg:flex-[3] border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col min-w-0 min-h-[40vh] lg:min-h-0">
             <div className="flex-1 relative overflow-hidden">
               {isPdf && rawFile ? (
                 <PdfViewer file={rawFile} />
@@ -255,22 +256,22 @@ const FileDetailModal: React.FC<FileDetailModalProps> = ({
             </div>
 
             {/* Chat Input */}
-            <div className="p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-md">
-              <form onSubmit={handleChatSubmit} className="flex items-center space-x-3 bg-white dark:bg-slate-800 p-2 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+            <div className="p-4 sm:p-6 lg:p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur-md">
+              <form onSubmit={handleChatSubmit} className="flex items-center space-x-2 sm:space-x-3 bg-white dark:bg-slate-800 p-1.5 sm:p-2 rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                 <input 
                   type="text" 
                   disabled={file.isClassifying}
                   placeholder={file.isClassifying ? "AI is indexing..." : "Query document details..."} 
-                  className="flex-1 bg-transparent border-none px-4 py-3 text-sm outline-none text-slate-900 dark:text-slate-100 font-medium"
+                  className="flex-1 bg-transparent border-none px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm outline-none text-slate-900 dark:text-slate-100 font-medium"
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
                 />
                 <button 
                   type="submit"
                   disabled={!chatMessage.trim() || isChatLoading || file.isClassifying}
-                  className="p-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all disabled:opacity-50 active:scale-95 shadow-md"
+                  className="p-2 sm:p-3 bg-indigo-600 text-white rounded-xl sm:rounded-2xl hover:bg-indigo-700 transition-all disabled:opacity-50 active:scale-95 shadow-md"
                 >
-                  <Icons.ArrowRight className="w-5 h-5" />
+                  <Icons.ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </form>
             </div>
