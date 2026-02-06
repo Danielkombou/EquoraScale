@@ -10,6 +10,16 @@
   html.dark {
     color-scheme: dark;
   }
+  
+  /* Prevent flash of white background */
+  body {
+    background-color: #f8fafc;
+    transition: background-color 0.2s ease;
+  }
+  
+  html.dark body {
+    background-color: #020617;
+  }
 }
 
 /* Custom scrollbar */

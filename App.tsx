@@ -32,7 +32,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 };
 
 const PublicLayout = () => (
-  <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+  <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
     <Outlet />
   </div>
 );
@@ -44,15 +44,25 @@ const App: React.FC = () => {
   const [authLoading, setAuthLoading] = useState(true);
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check if dark class was already applied by inline script
+    const hasDarkClass = document.documentElement.classList.contains('dark');
+    if (hasDarkClass) {
+      const saved = localStorage.getItem('theme');
+      return saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
     const saved = localStorage.getItem('theme');
     if (saved) return saved === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   useEffect(() => {
+    // Sync dark mode class immediately on mount (already set by inline script, but ensure consistency)
     const root = window.document.documentElement;
-    if (isDarkMode) root.classList.add('dark');
-    else root.classList.remove('dark');
+    if (isDarkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 

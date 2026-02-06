@@ -11,6 +11,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Prevent flash of unstyled content */
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        
+        html.dark, html.dark body {
+            background-color: #020617;
+            color: #f8fafc;
+        }
+        
+        #root {
+            min-height: 100vh;
+            background-color: inherit;
+        }
+        
         * {
             transition-property: background-color, border-color, color, fill, stroke;
             transition-duration: 200ms;
@@ -24,6 +42,16 @@
             scrollbar-width: none;
         }
     </style>
+    <script>
+        // Apply dark mode synchronously BEFORE React renders to prevent flash
+        (function() {
+            const saved = localStorage.getItem('theme');
+            const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
 <script type="importmap">
 {
   "imports": {
