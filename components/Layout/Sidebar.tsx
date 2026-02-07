@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { DocumentType, User } from '../../types';
 import { Icons } from '../../constants';
@@ -12,7 +12,6 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onLogout, user }) => {
   const navigate = useNavigate();
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const isAdmin = useIsAdmin();
   const canViewAnalytics = useCanAccess('analytics');
   
@@ -26,37 +25,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, user }) => {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg"
-      >
-        <Icons.List className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-      </button>
-
-      {/* Mobile Overlay */}
-      {isMobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
-
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0 transition-transform duration-300 z-40 ${
-        isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
-      <div className="h-16 flex items-center px-4 sm:px-6 border-b border-slate-100 dark:border-slate-800">
+      <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0">
+      <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center mr-3 shrink-0 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/20">
           <Icons.Sparkles className="text-white w-5 h-5" />
         </div>
-        <span className="font-bold text-lg sm:text-xl tracking-tight text-slate-800 dark:text-slate-100">Eqorascale</span>
-        <button
-          onClick={() => setIsMobileOpen(false)}
-          className="lg:hidden ml-auto p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-        >
-          <Icons.Plus className="w-5 h-5 rotate-45" />
-        </button>
+        <span className="font-bold text-xl tracking-tight text-slate-800 dark:text-slate-100">Eqorascale</span>
       </div>
 
       <nav className="flex-1 px-3 py-6 space-y-1">

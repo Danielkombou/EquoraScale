@@ -14,6 +14,7 @@ import RoleRoute from './components/Admin/RoleRoute';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserManagement from './components/Admin/UserManagement';
 import AdminAnalytics from './components/Admin/AdminAnalytics';
+import DesktopRequired from './components/UI/DesktopRequired';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -58,6 +59,11 @@ const PublicLayout = () => (
 );
 
 const App: React.FC = () => {
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.innerWidth >= 1024;
+  });
+  
   const [user, setUser] = useState<User | null>(() => {
     return JSON.parse(localStorage.getItem('eqorascale_user') || 'null');
   });
@@ -161,6 +167,11 @@ const App: React.FC = () => {
     setUser(null);
     localStorage.removeItem('eqorascale_user');
   };
+
+  // Show desktop required message for mobile/tablet
+  if (!isDesktop) {
+    return <DesktopRequired />;
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, isDarkMode }}>

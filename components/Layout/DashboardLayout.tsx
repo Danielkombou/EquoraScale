@@ -54,6 +54,52 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
   // Convert file structure to flat array
   const files: FileRecord[] = fileStructure ? flattenFileStructure(fileStructure, currentFolderPath) : [];
 
+  // Upload mutations
+  const uploadFileMutation = useMutation({
+    mutationFn: uploadFile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      toast.success('File uploaded successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to upload file');
+    },
+  });
+
+  const uploadMultipleMutation = useMutation({
+    mutationFn: uploadMultipleFiles,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      toast.success('Files uploaded successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to upload files');
+    },
+  });
+
+  const uploadFolderMutation = useMutation({
+    mutationFn: ({ files, folderPath }: { files: File[]; folderPath?: string }) => 
+      uploadFolder(files, folderPath),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      toast.success('Folder uploaded successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to upload folder');
+    },
+  });
+
+  const deleteFileMutation = useMutation({
+    mutationFn: deleteFile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      toast.success('File deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Failed to delete file');
+    },
+  });
+
   const extractText = async (file: File): Promise<string> => {
     const fileName = file.name.toLowerCase();
     try {
@@ -85,15 +131,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
   const triggerAnalysis = async (fileId: string, name: string, content: string) => {
     try {
       const result = await analyzeDocument(name, content);
-      setFiles(prev => prev.map(f => f.id === fileId ? {
-        ...f,
-        docType: result?.documentType as DocumentType || DocumentType.GENERAL,
-        tags: [...new Set([...f.tags, ...(result?.suggestedTags || [])])],
-        summary: result?.summary,
-        isClassifying: false
-      } : f));
+      // Invalidate queries to refresh file data after analysis
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      toast.success(`Analysis completed for ${name}`);
     } catch (err) {
-      setFiles(prev => prev.map(f => f.id === fileId ? { ...f, isClassifying: false } : f));
+      toast.error(`Failed to analyze ${name}`);
     }
   };
 
@@ -158,7 +200,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Sidebar user={user} onLogout={onLogout} />
 
-      <main className="flex-1 flex flex-col min-w-0 lg:ml-0">
+      <main className="flex-1 flex flex-col min-w-0">
         <header className="h-auto min-h-[64px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-4 lg:px-6 py-2 sm:py-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 sticky top-0 z-10 transition-colors">
           <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
             <div className="relative w-full max-w-2xl">
@@ -196,7 +238,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, isDar
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 overflow-auto p-8">
           {filesLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
